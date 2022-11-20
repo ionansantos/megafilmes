@@ -1,0 +1,41 @@
+version: '3.1'
+services:
+  web:
+    image: ionansantos/apache-php:7.4
+    expose:
+      - "80/tcp"
+      - "443/tcp"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./:/var/www/html
+      - ./logs/apache2:/var/log/apache2
+    depends_on:
+      - db
+    links:
+      - db
+    networks:
+      www_mega:
+    restart: always
+  db:
+    image: mysql:5.7
+    command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_520_ci']
+    expose:
+      - "3306/tcp"
+    ports:
+      - "8306:3306"
+    environment:
+      MYSQL_DATABASE: megafilmes
+      MYSQL_USER: local
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_PASSWORD: root
+    volumes:
+      - ./datadir:/var/lib/mysql
+      - ./initdb:/docker-entrypoint-initdb.d
+    restart: always
+    networks:
+      www_mega:
+networks:
+  www_mega:
+    external: true
